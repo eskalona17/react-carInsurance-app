@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "@emotion/styled";
-import {obtenerDiferenciaYear, calcularMarca, obtenerPlan} from '../helpers'
+import PropTYpes from "prop-types";
+import { obtenerDiferenciaYear, calcularMarca, obtenerPlan } from "../helpers";
 
 const Campo = styled.div`
   display: flex;
@@ -43,15 +44,15 @@ const Boton = styled.button`
 `;
 
 const Error = styled.div`
-    background-color: red;
-    color: white;
-    padding: 1rem;
-    width: 100%;
-    text-align: center;
-    margin-bottom: 2rem;
-` 
+  background-color: red;
+  color: white;
+  padding: 1rem;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 2rem;
+`;
 
-const Formulario = ({guardarResumen}) => {
+const Formulario = ({ guardarResumen, guardarCargando }) => {
   const [datos, guardarDatos] = useState({
     marca: "",
     year: "",
@@ -85,33 +86,42 @@ const Formulario = ({guardarResumen}) => {
     //una base de 2000
     let resultado = 2000;
 
-    //obtener la diferencia de años 
-    const diferencia = obtenerDiferenciaYear(year)
-    
+    //obtener la diferencia de años
+    const diferencia = obtenerDiferenciaYear(year);
+
     //por cada año hay que restar el 3% del valor
-    resultado -= ((diferencia * 3 ) * resultado) / 100
+    resultado -= (diferencia * 3 * resultado) / 100;
 
     //americano 15
     //asiatico 5
     //europeo 30
-    resultado = calcularMarca(marca) * resultado
+    resultado = calcularMarca(marca) * resultado;
 
     //basico aumenta 20%
 
     //completo 50%
-    const incrementoPlan = obtenerPlan(plan)
+    const incrementoPlan = obtenerPlan(plan);
     resultado = parseFloat(incrementoPlan * resultado).toFixed(2);
 
-    guardarResumen({
-      cotizacion: resultado,
-      datos
-    })
+    guardarCargando(true);
+
+    setTimeout(() => {
+      //elimina el spinner
+      guardarCargando(false);
+
+      //pasa la informacion al componente principal
+      guardarResumen({
+        cotizacion: Number(resultado),
+        datos,
+      });
+    }, 3000);
+
     //total
   };
 
   return (
     <form onSubmit={cotizarSeguro}>
-        {error ? <Error>Todos los campos son obligatorios</Error> : null}
+      {error ? <Error>Todos los campos son obligatorios</Error> : null}
       <Campo>
         <Label>Marca</Label>
         <Select name="marca" value={marca} onChange={ObtenerInformacion}>
@@ -159,6 +169,11 @@ const Formulario = ({guardarResumen}) => {
       <Boton type="submit">Cotizar</Boton>
     </form>
   );
+};
+
+Formulario.propTypes = {
+  guardarResumen: PropTYpes.func.isRequired,
+  guardarCargando: PropTYpes.func.isRequired,
 };
 
 export default Formulario;

@@ -166,7 +166,7 @@ const Formulario = ({ guardarResumen, guardarCargando }) => {
         />{" "}
         Completo
       </Campo>
-      <Boton type="submit">Cotizar</Boton>
+      <Boton type="submit">Simular</Boton>
     </form>
   );
 };
